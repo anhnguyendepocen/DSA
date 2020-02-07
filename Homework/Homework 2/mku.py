@@ -8,6 +8,7 @@ Question 1 (strictly ascending lists)
 import pytest
 import timeit
 import random
+import matplotlib.pyplot as plt
 
 class Node():
     def __init__(self, val=None, prev=None, next=None):
@@ -293,3 +294,107 @@ def test_index():
 
     # Check value at end of list (should be 1)
     assert my_DLL.index(my_DLL.length()-1).val == 1
+
+'''
+--------------------------------------------------------------------------------
+Question 2
+
+Averaging runtimes for indexing and multiplying all pairs
+'''
+def get_index_runtime():
+
+    '''
+    Returns plot of runtimes for indexing both a DLL and a python list.
+
+    '''
+    DLL_runtimes = []
+    list_runtimes = []
+
+    for n in range(10,10000, 10):
+        my_DLL = DLL()
+        my_list = []
+
+        # Creates DLL with numbers from 0 to n
+        for i in range(n):
+            my_DLL.push(i)
+            my_list.append(n)
+
+        t = timeit.Timer('my_DLL.index(random.randrange(n))', 'import random', globals=locals())
+        t2 = timeit.Timer('my_list[random.randrange(n)]', 'import random', globals=locals())
+        # repeats indexing action 50 times and stores average
+        runtime = t.timeit(50)
+        runtime2 = t2.timeit(50)
+
+        DLL_runtimes.append(runtime)
+        list_runtimes.append(runtime2)
+
+    #plot both results on same graph
+    plt.plot(range(10, 10000, 10), DLL_runtimes, '.', label="DLL")
+    plt.plot(range(10, 10000, 10), list_runtimes, '.', label="python list")
+    plt.xlabel("Input Size (n)")
+    plt.ylabel("Average Runtime")
+    plt.legend()
+    plt.title("Indexing Runtime Across Different Input Sizes")
+    fig = plt.gcf()
+    fig.savefig("indexing_runtimes.png")
+    plt.show()
+
+def get_multiply_linear_runtime():
+    '''
+    Returns plot of runtimes for multiplying pairs with the operation with a linear runtime.
+    '''
+    runtimes = []
+
+    for n in range(10,10000):
+        my_DLL = DLL()
+
+        # Creates DLL with numbers from 0 to n
+        for i in range(n):
+            my_DLL.push(i)
+
+        t = timeit.Timer('my_DLL.multiply_all_pairs_linear()', globals=locals())
+
+        runtime = t.timeit(1)
+
+        runtimes.append(runtime)
+
+    #plot results
+    plt.plot(range(10, 10000), runtimes, '.')
+    plt.xlabel("Input Size (n)")
+    plt.ylabel("Average Runtime")
+    plt.title("DLL Multiplying Runtime Across Different Input Sizes (Linear)")
+    fig = plt.gcf()
+    fig.savefig("lin_multiplying_runtimes.png")
+    plt.show()
+
+def get_multiply_runtime():
+    '''
+    Returns plot of runtime of multiplying pairs with a Big O runtime of O(n^2).
+    '''
+    runtimes = []
+
+    for n in range(10,10000,1000):
+        my_DLL = DLL()
+
+        # Creates DLL with numbers from 0 to n
+        for i in range(n):
+            my_DLL.push(i)
+
+        t = timeit.Timer('my_DLL.multiply_all_pairs()', globals=locals())
+
+        runtime = t.timeit(1)
+
+        runtimes.append(runtime)
+
+    #plot results
+    plt.plot(range(10, 10000, 1000), runtimes, '.')
+    plt.xlabel("Input Size (n)")
+    plt.ylabel("Average Runtime")
+    plt.title("DLL Multiplying Runtime Across Different Input Sizes (Quadratic)")
+    fig = plt.gcf()
+    fig.savefig("quad_multiplying_runtimes.png")
+    plt.show()
+
+#get_index_runtime()
+#get_multiply_linear_runtime()
+get_multiply_runtime()

@@ -5,6 +5,8 @@ Author: Megan Ku
 """
 import random
 import networkx as nx
+import timeit
+
 from graphs import I
 
 # This code is meant for polyhedra that are tricolored.
@@ -13,7 +15,7 @@ COLORS = ("yellow", "green", "blue")
 
 def color_graph_greedy(G):
     """
-    Returns a greedy coloring solution for a given graph, with the added parameter
+    Returns a greedy coloring solution for a given graph, with the added requirement
     that the distribution of colors should be as equal as possible.
     G = graph to be colored
     returns a hashmap of the number node and its color, a hashmap of the color distribution totals, and the node number of any violations.
@@ -160,14 +162,34 @@ def color_combined_search(G):
     return color_local_search(G, best_node_color, best_color_count, violations)
 
 
-def test_color_algs(G):
+def time_color_algs():
 
-    pass
+    # Using graph I
 
+    t = timeit.Timer('color_graph_greedy(I)', globals=locals(), setup="from __main__ import color_graph_greedy, I")
+    node_color, color_count, violations = color_graph_greedy(I)
+    t2 = timeit.Timer('color_local_search(I, node_color, color_count, violations)', globals=locals(), setup="from __main__ import color_local_search, I")
 
+    return t.timeit(1), t2.timeit(1)
+
+def optimality_gap_algs(G, iterations):
+    greedy_gap = []
+    local_gap = []
+    num_nodes = len(G.nodes())
+
+    for i in range(iterations):
+        node_color, color_count, violations = color_graph_greedy(G)
+        greedy_gap.append(len(violations))
+        node_color, color_count, violations = color_local_search(G, node_color, color_count, violations)
+        local_gap.append(len(violations))
+
+    greedy_opt = sum(greedy_gap) / len(greedy_gap) / num_nodes
+    local_opt = sum(local_gap) / len(local_gap) / num_nodes
+
+    return greedy_opt, local_opt
 if __name__ == "__main__":
 
-    # node_color, color_count, violations = color_graph_greedy(I)
-    # node_color, color_count, violations = color_local_search(I, node_color, color_count, violations)
-    node_color, color_count, violations = color_combined_search(I)
-    print(node_color, color_count, violations)
+    t, t2 = time_color_algs()
+    greedy_opt, local_opt = optimality_gap_algs(I, 100)
+    print("Greedy heuristic algorithm: ", t, " seconds, optimality gap of ", greedy_opt)
+    print("Local search algorithm: ", t2, " seconds, optimality gap of ", local_opt)

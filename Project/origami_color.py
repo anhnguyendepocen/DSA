@@ -112,27 +112,28 @@ def color_local_search(G, node_color, color_count, violations):
             color_neighbors[node_color[neighbor]].append(neighbor)
 
         # Change the current node color to the one that gives the least new number of violations
-        if curr_color == COLORS[0]:
-            if len(color_neighbors[COLORS[1]]) <= len(color_neighbors[COLORS[2]]):
-                best_color = COLORS[1]
+        if len(color_neighbors[curr_color]) > 0:
+            if curr_color == COLORS[0]:
+                if len(color_neighbors[COLORS[1]]) <= len(color_neighbors[COLORS[2]]):
+                    best_color = COLORS[1]
+                else:
+                    best_color = COLORS[2]
+            elif curr_color == COLORS[1]:
+                if len(color_neighbors[COLORS[0]]) <= len(color_neighbors[COLORS[2]]):
+                    best_color = COLORS[0]
+                else:
+                    best_color = COLORS[2]
             else:
-                best_color = COLORS[2]
-        elif curr_color == COLORS[1]:
-            if len(color_neighbors[COLORS[0]]) <= len(color_neighbors[COLORS[2]]):
-                best_color = COLORS[0]
-            else:
-                best_color = COLORS[2]
-        else:
-            if len(color_neighbors[COLORS[0]]) <= len(color_neighbors[COLORS[1]]):
-                best_color = COLORS[0]
-            else:
-                best_color = COLORS[1]
+                if len(color_neighbors[COLORS[0]]) <= len(color_neighbors[COLORS[1]]):
+                    best_color = COLORS[0]
+                else:
+                    best_color = COLORS[1]
 
-        # Update node counts and colors
-        node_color[node] = best_color
-        violations += color_neighbors[best_color]
-        color_count[curr_color] -= 1
-        color_count[best_color] += 1
+            # Update node counts and colors
+            node_color[node] = best_color
+            violations += color_neighbors[best_color]
+            color_count[curr_color] -= 1
+            color_count[best_color] += 1
 
     return node_color, color_count, violations
 
